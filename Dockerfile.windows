@@ -1,0 +1,40 @@
+# 使用官方的 Windows 构建环境
+FROM ubuntu:22.04
+
+# 避免交互式配置
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 安装基础依赖
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    libgtk-3-dev \
+    libayatana-appindicator3-dev \
+    librsvg2-dev \
+    mingw-w64 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# 添加 Windows 目标
+RUN rustup target add x86_64-pc-windows-gnu
+
+# 安装 Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制项目文件
+COPY . .
+
+# 安装前端依赖
+RUN npm install
+
+# 构建脚本
+CMD ["cargo", "tauri", "build", "--target", "x86_64-pc-windows-gnu"]
