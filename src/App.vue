@@ -2,6 +2,8 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+// 检测是否在 Tauri 环境中
+const isTauriApp = true; // 暂时强制使用 Tauri 模式来测试对话框功能
 
 // Batch URL Converter
 const urls = ref("");
@@ -61,13 +63,59 @@ async function startConversion() {
   }
 }
 
-function downloadCSV() {
-  const headers = ["短链", "长链"];
-  const csvContent = [
-    headers.join(","),
-    ...results.value.map(r => `"${r.short_url}","${r.long_url}"`)
-  ].join("\n");
+async function downloadCSV() {
+  try {
+    // 准备CSV内容
+    const headers = ["短链", "长链"];
+    const csvContent = [
+      headers.join(","),
+      ...results.value.map(r => `"${r.short_url}","${r.long_url}"`)
+    ].join("\n");
 
+    console.log('开始下载CSV，isTauriApp:', isTauriApp);
+
+    if (isTauriApp) {
+      // Tauri 环境：尝试使用文件对话框
+      try {
+        console.log('正在尝试导入Tauri插件...');
+        const { save } = await import('@tauri-apps/plugin-dialog');
+        const { writeTextFile } = await import('@tauri-apps/plugin-fs');
+
+        console.log('Tauri插件导入成功，正在打开保存对话框...');
+        const selectedPath = await save({
+          filters: [{
+            name: 'CSV Files',
+            extensions: ['csv']
+          }],
+          defaultPath: 'converted_urls.csv'
+        });
+
+        console.log('用户选择的路径:', selectedPath);
+
+        if (selectedPath) {
+          await writeTextFile(selectedPath, `\uFEFF${csvContent}`);
+          alert('文件保存成功！');
+        } else {
+          console.log('用户取消了保存操作');
+        }
+      } catch (pluginError) {
+        console.log('插件不可用，回退到浏览器下载方式:', pluginError);
+        alert(`插件不可用: ${pluginError.message}`);
+        // 回退到浏览器方式
+        downloadInBrowser(csvContent);
+      }
+    } else {
+      // 浏览器环境：直接下载
+      console.log('使用浏览器下载方式');
+      downloadInBrowser(csvContent);
+    }
+  } catch (error) {
+    console.error('下载文件时出错:', error);
+    alert(`下载失败: ${error.message}`);
+  }
+}
+
+function downloadInBrowser(csvContent) {
   const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
