@@ -22,10 +22,10 @@
 5. **等待构建完成** - 访问 GitHub 仓库的 "Releases" 页面下载构建结果
 
 ### 输出文件：
-- **Windows**: `.exe` 可执行文件 + `.msi` 安装包
-- **macOS Universal**: 通用二进制文件（支持 Intel + Apple Silicon）
-- **macOS Intel**: Intel 专用版本
-- **macOS**: `.app` 应用 + `.dmg` 安装包
+- **Windows**: `.exe` 可执行文件 + `.msi` 安装包 + NSIS 安装程序
+- **macOS**: `.app` 应用 + `.dmg` 安装包（支持 Intel 和 Apple Silicon）
+
+**注意**: GitHub Actions 会在最新的 macOS runner 上构建，自动生成适用于 Intel 和 Apple Silicon Mac 的通用二进制文件。
 
 ## 🛠️ 方案二：本地交叉编译（实验性）
 
