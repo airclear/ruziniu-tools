@@ -22,4 +22,10 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+reqwest = { version = "0.12", features = ["native-tls"] }
+tokio = { version = "1", features = ["full"] }
+regex = "1.10"
 
+[[test]]
+name = "integration_test"
+path = "tests/integration_test.rs"
