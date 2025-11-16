@@ -8,18 +8,32 @@
 
 1. **完成开发** - 确保您的应用在本地正常运行
 2. **更新版本号** - 在 `tauri.conf.json` 中更新版本号
-3. **提交并推送代码**
+3. **检查 GitHub Actions 权限** - 确保仓库设置中允许 Actions 创建 Releases
+4. **提交并推送代码**
    ```bash
    git add .
    git commit -m "准备发布 v0.1.0"
    git push origin main
    ```
-4. **创建版本标签**
+5. **创建版本标签**
    ```bash
    git tag v0.1.0
    git push origin v0.1.0
    ```
-5. **等待构建完成** - 访问 GitHub 仓库的 "Releases" 页面下载构建结果
+6. **等待构建完成** - 访问 GitHub 仓库的 "Releases" 页面下载构建结果
+
+### 权限设置
+
+如果遇到权限错误，请检查以下设置：
+
+1. **仓库权限设置**：
+   - 进入 GitHub 仓库 → Settings → Actions → General
+   - 在 "Workflow permissions" 中选择 "Read and write permissions"
+   - 勾选 "Allow GitHub Actions to create and approve pull requests"
+
+2. **个人访问令牌**（如果需要）：
+   - 确保您的 Personal Access Token 有 `repo` 权限
+   - 在仓库的 Secrets 中添加 `GITHUB_TOKEN`
 
 ### 输出文件：
 - **Windows**: `.exe` 可执行文件 + `.msi` 安装包 + NSIS 安装程序
